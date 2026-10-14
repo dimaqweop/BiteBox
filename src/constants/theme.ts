@@ -1,0 +1,30 @@
+export const theme = {
+  colors: {
+    primary: "#FF6B35",
+    primaryDark: "#E85A2A",
+    primaryLight: "#FFF0E5",
+    background: "#FFF9F5",
+    surface: "#FFFFFF",
+    surfaceSecondary: "#FFF3EA",
+    textPrimary: "#242424",
+    textSecondary: "#7A7A7A",
+    textMuted: "#A0A0A0",
+    border: "#F0E8E2",
+    success: "#22C55E",
+    warning: "#F59E0B",
+    error: "#EF4444",
+    // Accessible text variants on light surfaces.
+    primaryText: "#B83D13",
+    errorText: "#B42318",
+    secondaryText: "#66615D",
+  },
+  fonts: {
+    regular: "Manrope_400Regular",
+    medium: "Manrope_500Medium",
+    semibold: "Manrope_600SemiBold",
+    bold: "Manrope_700Bold",
+    extraBold: "Manrope_800ExtraBold",
+  },
+  spacing: { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 24, xxxl: 32, huge: 40 },
+  radius: { small: 8, medium: 12, large: 16, extraLarge: 24, pill: 999 },
+} as const;
