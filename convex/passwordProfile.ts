@@ -6,7 +6,7 @@ import {
   validateName,
   validatePassword,
   validatePhone,
-} from "../../src/lib/validation";
+} from "../src/lib/validation";
 
 export function validateNewPassword(password: string) {
   if (typeof password !== "string" || validatePassword(password)) {
@@ -20,7 +20,11 @@ export function passwordProfile(params: Record<string, Value | undefined>) {
   }
   const email = normalizeEmail(params.email);
   if (params.flow === "signIn") {
-    if (typeof params.password !== "string" || !params.password || params.password.length > 128) {
+    if (
+      typeof params.password !== "string" ||
+      !params.password ||
+      params.password.length > 128
+    ) {
       throw new ConvexError("INVALID_CREDENTIALS");
     }
     return { email };
@@ -29,13 +33,18 @@ export function passwordProfile(params: Record<string, Value | undefined>) {
   if (typeof params.name !== "string" || validateName(params.name)) {
     throw new ConvexError("INVALID_NAME");
   }
-  if (typeof params.phone !== "string" || validatePhone(params.phone)) {
+  if (
+    params.phone !== undefined &&
+    (typeof params.phone !== "string" || validatePhone(params.phone))
+  ) {
     throw new ConvexError("INVALID_PHONE");
   }
   return {
     email,
     name: params.name.trim(),
-    phone: normalizePhone(params.phone),
+    ...(typeof params.phone === "string" && params.phone.trim()
+      ? { phone: normalizePhone(params.phone) }
+      : {}),
     role: "customer" as const,
     createdAt: Date.now(),
   };

@@ -28,13 +28,17 @@ export function validateName(value: string): string | undefined {
 }
 
 export function validatePhone(value: string): string | undefined {
+  if (!value.trim()) return;
   if (!/^\+[1-9]\d{7,14}$/.test(normalizePhone(value))) {
     return "Введіть номер у форматі +380XXXXXXXXX.";
   }
 }
 
 export function validatePassword(value: string): string | undefined {
-  if (value.length < PASSWORD_MIN_LENGTH || value.length > PASSWORD_MAX_LENGTH) {
+  if (
+    value.length < PASSWORD_MIN_LENGTH ||
+    value.length > PASSWORD_MAX_LENGTH
+  ) {
     return "Пароль має містити від 8 до 128 символів.";
   }
   if (!value.trim()) return "Пароль не може складатися лише з пробілів.";

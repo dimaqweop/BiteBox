@@ -1,8 +1,12 @@
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { currentUser } from "./lib/currentUser";
+import { currentUser } from "./currentUser";
 import schema from "./schema";
-import { normalizePhone, validateName, validatePhone } from "../src/lib/validation";
+import {
+  normalizePhone,
+  validateName,
+  validatePhone,
+} from "../src/lib/validation";
 
 export const getCurrentUser = query({
   args: {},
@@ -13,19 +17,24 @@ export const getCurrentUser = query({
 });
 
 export const updateProfile = mutation({
-  args: { name: v.string(), phone: v.string() },
+  args: { name: v.string(), phone: v.optional(v.string()) },
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await currentUser(ctx);
     if (user === null) {
       throw new ConvexError("UNAUTHENTICATED");
     }
-    if (validateName(args.name) || validatePhone(args.phone)) {
+    if (
+      validateName(args.name) ||
+      (args.phone !== undefined && validatePhone(args.phone))
+    ) {
       throw new ConvexError("INVALID_PROFILE");
     }
     await ctx.db.patch("users", user._id, {
       name: args.name.trim(),
-      phone: normalizePhone(args.phone),
+      ...(args.phone !== undefined
+        ? { phone: normalizePhone(args.phone) || undefined }
+        : {}),
     });
     return null;
   },

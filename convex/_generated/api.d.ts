@@ -9,13 +9,23 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as cart from "../cart.js";
+import type * as cartHelpers from "../cartHelpers.js";
+import type * as catalog from "../catalog.js";
+import type * as catalogData from "../catalogData.js";
+import type * as currentUser from "../currentUser.js";
+import type * as explore from "../explore.js";
 import type * as favorites from "../favorites.js";
 import type * as home from "../home.js";
 import type * as http from "../http.js";
-import type * as lib_currentUser from "../lib/currentUser.js";
-import type * as lib_demoCatalog from "../lib/demoCatalog.js";
-import type * as lib_passwordProfile from "../lib/passwordProfile.js";
+import type * as menuData from "../menuData.js";
 import type * as notifications from "../notifications.js";
+import type * as orders from "../orders.js";
+import type * as passwordProfile from "../passwordProfile.js";
+import type * as restaurantAccess from "../restaurantAccess.js";
+import type * as restaurantOrders from "../restaurantOrders.js";
+import type * as restaurantOwners from "../restaurantOwners.js";
+import type * as reviews from "../reviews.js";
 import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
@@ -27,13 +37,23 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  cart: typeof cart;
+  cartHelpers: typeof cartHelpers;
+  catalog: typeof catalog;
+  catalogData: typeof catalogData;
+  currentUser: typeof currentUser;
+  explore: typeof explore;
   favorites: typeof favorites;
   home: typeof home;
   http: typeof http;
-  "lib/currentUser": typeof lib_currentUser;
-  "lib/demoCatalog": typeof lib_demoCatalog;
-  "lib/passwordProfile": typeof lib_passwordProfile;
+  menuData: typeof menuData;
   notifications: typeof notifications;
+  orders: typeof orders;
+  passwordProfile: typeof passwordProfile;
+  restaurantAccess: typeof restaurantAccess;
+  restaurantOrders: typeof restaurantOrders;
+  restaurantOwners: typeof restaurantOwners;
+  reviews: typeof reviews;
   seed: typeof seed;
   users: typeof users;
 }>;
