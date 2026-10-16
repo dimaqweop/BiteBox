@@ -1,18 +1,8 @@
-import { getAuthSessionId, getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query, type QueryCtx, type MutationCtx } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
+import { currentUser } from "./lib/currentUser";
 import schema from "./schema";
 import { normalizePhone, validateName, validatePhone } from "../src/lib/validation";
-
-async function currentUser(ctx: QueryCtx | MutationCtx) {
-  const userId = await getAuthUserId(ctx);
-  const sessionId = await getAuthSessionId(ctx);
-  if (userId === null || sessionId === null) return null;
-  const session = await ctx.db.get("authSessions", sessionId);
-  // A signed-out session must stop granting access even before its JWT expires.
-  if (session === null || session.userId !== userId) return null;
-  return await ctx.db.get("users", userId);
-}
 
 export const getCurrentUser = query({
   args: {},

@@ -9,8 +9,14 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as favorites from "../favorites.js";
+import type * as home from "../home.js";
 import type * as http from "../http.js";
+import type * as lib_currentUser from "../lib/currentUser.js";
+import type * as lib_demoCatalog from "../lib/demoCatalog.js";
 import type * as lib_passwordProfile from "../lib/passwordProfile.js";
+import type * as notifications from "../notifications.js";
+import type * as seed from "../seed.js";
 import type * as users from "../users.js";
 
 import type {
@@ -21,8 +27,14 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  favorites: typeof favorites;
+  home: typeof home;
   http: typeof http;
+  "lib/currentUser": typeof lib_currentUser;
+  "lib/demoCatalog": typeof lib_demoCatalog;
   "lib/passwordProfile": typeof lib_passwordProfile;
+  notifications: typeof notifications;
+  seed: typeof seed;
   users: typeof users;
 }>;
 

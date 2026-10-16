@@ -5,5 +5,5 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 export default function Index() {
   const { isLoading, isAuthenticated } = useConvexAuth();
   if (isLoading) return <LoadingScreen />;
-  return <Redirect href={isAuthenticated ? "/profile" : "/(auth)/login"} />;
+  return <Redirect href={isAuthenticated ? "/home" : "/(auth)/login"} />;
 }
