@@ -85,7 +85,7 @@ The official @convex-dev/expo-push-notifications component queues and retries de
 
 ### Finish device setup
 
-EAS init and Android build configuration are complete. The FCM V1 service-account key for Firebase project bitebox-b7a44 is uploaded to EAS and assigned to com.bitebox.app.dev. eas.json sets APP_ENV for each build profile. A native development build is still required to test Android push; remote push does not work in Expo Go. iOS APNs credentials remain to be configured.
+EAS init and Android build configuration are complete. The FCM V1 service-account key for Firebase project bitebox-b7a44 is uploaded to EAS and assigned to com.bitebox.app.dev. The separate Firebase client configuration is uploaded as the secret file variable GOOGLE_SERVICES_JSON in the EAS development environment. app.config.ts uses that file path on EAS and falls back to ./google-services.json locally; it stays Git-ignored. The development build profile explicitly selects the development environment. eas.json sets APP_ENV for each build profile. A native development build is still required to test Android push; remote push does not work in Expo Go. iOS APNs credentials remain to be configured.
 
 1. In Firebase, register the Android app with package com.bitebox.app.dev for the development build. Download its google-services.json to the repository root (Git-ignored). For release, register com.bitebox.app and use its matching Firebase configuration.
 2. Run npx eas-cli@latest build:configure to generate the EAS build profiles. Set APP_ENV to development, preview or production in the corresponding profile. Ensure EXPO_PUBLIC_CONVEX_URL and EXPO_PUBLIC_CONVEX_SITE_URL are available in the EAS build environment too; local .env.local is not uploaded automatically.

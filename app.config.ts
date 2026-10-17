@@ -22,7 +22,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       package: isDev ? `${PACKAGE_NAME}.dev` : PACKAGE_NAME,
-      googleServicesFile: "./google-services.json",
+      googleServicesFile:
+        process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
       permissions: [
         "android.permission.VIBRATE",
         "android.permission.POST_NOTIFICATIONS",
@@ -43,6 +44,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ],
     extra: {
       ...config.extra,
+      eas: {
+        projectId: "5d8c01fc-7946-4591-a2e2-f78e332d879a",
+      },
     },
   };
 };

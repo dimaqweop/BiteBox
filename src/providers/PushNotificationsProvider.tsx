@@ -9,6 +9,7 @@ import {
 } from "react";
 import { AppState, Linking, Platform } from "react-native";
 import Constants from "expo-constants";
+import { isRunningInExpoGo } from "expo";
 import * as SecureStore from "expo-secure-store";
 import { router, useRootNavigationState } from "expo-router";
 import { useConvexConnectionState, useMutation } from "convex/react";
@@ -36,9 +37,7 @@ const TOKEN_STORAGE_KEY = "bitebox.pushToken";
 const projectId =
   Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
 const available =
-  Platform.OS !== "web" &&
-  !Constants.expoGoConfig &&
-  Constants.appOwnership !== "expo";
+  Platform.OS !== "web" && !isRunningInExpoGo();
 
 function hasPermission(
   permission: ExpoNotifications.NotificationPermissionsStatus,
