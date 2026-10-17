@@ -14,6 +14,7 @@ import {
   validatePhone,
 } from "../src/lib/validation";
 import schema from "./schema";
+import { notifyNewOrder, notifyOrderStatus } from "./orderNotifications";
 
 export const place = mutation({
   args: {
@@ -106,7 +107,7 @@ export const place = mutation({
     if (moneyToCents(quote.total) !== moneyToCents(args.expectedTotal))
       throw new ConvexError("PRICE_CHANGED");
 
-    return await ctx.db.insert("orders", {
+    const orderId = await ctx.db.insert("orders", {
       userId: user._id,
       restaurantId: quote.restaurant.id,
       restaurantName: quote.restaurant.name,
@@ -131,6 +132,9 @@ export const place = mutation({
       idempotencyKey: args.idempotencyKey,
       createdAt: Date.now(),
     });
+    const order = await ctx.db.get("orders", orderId);
+    if (order) await notifyNewOrder(ctx, order);
+    return orderId;
   },
 });
 
@@ -199,6 +203,7 @@ export const updateStatus = mutation({
     if (!transitions[order.status].includes(args.status))
       throw new ConvexError("INVALID_STATUS_TRANSITION");
     await ctx.db.patch("orders", order._id, { status: args.status });
+    await notifyOrderStatus(ctx, { ...order, status: args.status });
     return null;
   },
 });

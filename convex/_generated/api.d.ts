@@ -20,8 +20,10 @@ import type * as home from "../home.js";
 import type * as http from "../http.js";
 import type * as menuData from "../menuData.js";
 import type * as notifications from "../notifications.js";
+import type * as orderNotifications from "../orderNotifications.js";
 import type * as orders from "../orders.js";
 import type * as passwordProfile from "../passwordProfile.js";
+import type * as pushNotifications from "../pushNotifications.js";
 import type * as restaurantAccess from "../restaurantAccess.js";
 import type * as restaurantOrders from "../restaurantOrders.js";
 import type * as restaurantOwners from "../restaurantOwners.js";
@@ -48,8 +50,10 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   menuData: typeof menuData;
   notifications: typeof notifications;
+  orderNotifications: typeof orderNotifications;
   orders: typeof orders;
   passwordProfile: typeof passwordProfile;
+  pushNotifications: typeof pushNotifications;
   restaurantAccess: typeof restaurantAccess;
   restaurantOrders: typeof restaurantOrders;
   restaurantOwners: typeof restaurantOwners;
@@ -84,4 +88,6 @@ export declare const internal: FilterApi<
   FunctionReference<any, "internal">
 >;
 
-export declare const components: {};
+export declare const components: {
+  pushNotifications: import("@convex-dev/expo-push-notifications/_generated/component.js").ComponentApi<"pushNotifications">;
+};

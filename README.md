@@ -16,7 +16,7 @@ Start with `npx expo start`, or `npm run web` for the web preview. Rebuild any d
 - Email/phone normalization and validation run on client and backend. New accounts receive the server-assigned customer role.
 - Native sessions persist in Expo SecureStore. Web preview keeps tokens in memory, so page reload requires signing in again.
 - Private profile access checks the current user and server session. Sign-out invalidates the session and refresh tokens.
-- users.pushToken is an optional string reserved for the notifications feature.
+- users.pushToken mirrors the most recently registered Expo push token. Separate pushDevices records support multiple phones and bind tokens to authenticated sessions.
 - Password reset and email verification await a real email provider integration.
 
 To verify manually: register, check the profile, restart on a phone to check persistence, sign out, then sign in again. Check invalid email/phone, mismatched passwords and incorrect login credentials.
@@ -33,7 +33,7 @@ After sign-in the app opens Home. The bottom navigation includes Home, Explore (
 
 The catalog comes from indexed Convex queries. Photos are stored as Convex Storage IDs and loaded with Expo Image. Favorites and notifications use the current authenticated user and server session.
 
-The six existing restaurants in Lviv are the app's regular catalog, with four dishes per restaurant (24 total). Their original document IDs, photos and favorite relationships are preserved. New dishes without photos use the normal image placeholder. Restaurant locations currently specify the city only. Live push delivery and courier integrations remain for later stages.
+The six existing restaurants in Lviv are the app's regular catalog, with four dishes per restaurant (24 total). Their original document IDs, photos and favorite relationships are preserved. New dishes without photos use the normal image placeholder. Restaurant locations currently specify the city only. Courier integrations remain for a later stage.
 
 To populate a new development deployment, run `npx convex run seed:catalog '{}'` after deploying. The seed is internal and idempotent; run it only against a development deployment. `seed:activateCatalog` adopts an older demo catalog in place. City selection currently persists while the app is open.
 
@@ -72,3 +72,25 @@ Favorites has a dedicated private paginated screen linked from Profile. Hearts s
 Authentication, food and cart forms keep their action footer outside the scrollable content. iOS uses KeyboardAvoidingView padding; Android uses the configured resize mode. Auth fields support Next/Submit focus navigation. Test software-keyboard behavior on a physical device: desktop web previews cannot simulate the native keyboard. Changes to Android keyboard layout configuration require a rebuilt development build. Expo Haptics provides native feedback when adding dishes.
 
 Source formatting uses multiline JSX and separated logical blocks. Screen implementations stay in route files; formatting does not extract them into new components.
+
+## Order push notifications
+
+The EAS project is @dimahd_dev/BiteBox, ID 5d8c01fc-7946-4591-a2e2-f78e332d879a (stored in app.json and inherited by app.config.ts). app.config.ts adapts the provided environment-based configuration: BiteBox Dev / com.bitebox.app.dev / bitebox-dev for development, BiteBox / com.bitebox.app / bitebox for preview and production. APP_ENV defaults to development; set it explicitly for release profiles. The required plugins are expo-router, expo-splash-screen, expo-secure-store and expo-notifications. Explicit Android permissions are VIBRATE and POST_NOTIFICATIONS; expo-notifications supplies its other native requirements.
+
+A new order creates an inbox notification for its assigned restaurant owner. Confirmed, preparing, delivering, delivered and cancelled statuses notify the customer; ready_for_pickup stays visible in the order without an extra push. Notifications are created atomically with order mutations, so replaying checkout does not create duplicates. Bodies exclude delivery addresses and phone numbers. Tapping an inbox entry or a push opens the correct customer/restaurant order route. Cold-start responses wait for authentication and navigation; responses for another signed-in account are ignored.
+
+PushNotificationsProvider loads expo-notifications only outside web and Expo Go. Enable push from Profile or the notification sheet. Existing permission is reused after sign-in, reconnect and returning to the foreground; the OS permission prompt is requested only from the enable button. Android creates the orders channel before requesting permission. Permission refusal does not block ordering or the inbox. Native tokens are remembered in SecureStore to remove registrations after permission revocation. Logout unregisters this device and clears its queued/presented notifications; another phone stays registered. Token rotation replaces the old token for the session, and switching accounts transfers the token. Each user may register up to ten active devices. Revoked/expired sessions are removed before new sends.
+
+The official @convex-dev/expo-push-notifications component queues and retries delivery. A scheduled internal check pauses registrations rejected by the Expo gateway until the app registers them again. Its delivered state means the Expo gateway accepted the push, not proof that the phone displayed it. Enhanced Expo push security can use the optional Convex EXPO_ACCESS_TOKEN environment variable. No public API accepts an arbitrary recipient or message.
+
+### Finish device setup
+
+EAS init and Android build configuration are complete. The FCM V1 service-account key for Firebase project bitebox-b7a44 is uploaded to EAS and assigned to com.bitebox.app.dev. eas.json sets APP_ENV for each build profile. A native development build is still required to test Android push; remote push does not work in Expo Go. iOS APNs credentials remain to be configured.
+
+1. In Firebase, register the Android app with package com.bitebox.app.dev for the development build. Download its google-services.json to the repository root (Git-ignored). For release, register com.bitebox.app and use its matching Firebase configuration.
+2. Run npx eas-cli@latest build:configure to generate the EAS build profiles. Set APP_ENV to development, preview or production in the corresponding profile. Ensure EXPO_PUBLIC_CONVEX_URL and EXPO_PUBLIC_CONVEX_SITE_URL are available in the EAS build environment too; local .env.local is not uploaded automatically.
+3. Run npx eas-cli@latest credentials --platform android, select the development profile, and upload the Firebase service-account key under Google Service Account / FCM V1. The service-account private key is different from google-services.json; keep it outside Git. For iOS, configure an APNs key and provisioning for com.bitebox.app.dev with an Apple Developer account.
+4. Build when ready: npx eas-cli@latest build --platform android --profile development. Install the development build and start Metro with npx expo start --dev-client.
+5. Sign in on the phone, open Profile and enable notifications. Place an order from a customer account; the restaurant owner's phone should receive the new-order push. Change its status and verify customer pushes in foreground, background and after closing the app. Tap to check navigation, then test logout/account switching. Owner logins remain in restaurant-access.local.json.
+
+References: [Expo SDK 57 notifications](https://docs.expo.dev/versions/v57.0.0/sdk/notifications/), [FCM V1 credentials](https://docs.expo.dev/push-notifications/fcm-credentials/), [Convex push component](https://github.com/get-convex/expo-push-notifications).

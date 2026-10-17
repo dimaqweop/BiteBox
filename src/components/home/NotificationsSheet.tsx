@@ -4,6 +4,9 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Sheet } from "@/components/ui/Sheet";
 import { theme } from "@/constants/theme";
+import { router } from "expo-router";
+import { usePushNotifications } from "@/providers/PushNotificationsProvider";
+import { AppButton } from "@/components/ui/AppButton";
 
 export function NotificationsSheet({
   visible,
@@ -12,13 +15,40 @@ export function NotificationsSheet({
   visible: boolean;
   onClose: () => void;
 }) {
+  const push = usePushNotifications();
   const notifications = useQuery(
     api.notifications.getMyNotifications,
     visible ? {} : "skip",
   );
   const markAsRead = useMutation(api.notifications.markAsRead);
   return (
-    <Sheet visible={visible} title="Сповіщення" onClose={onClose}>
+    <Sheet
+      visible={visible}
+      title="Сповіщення"
+      onClose={onClose}
+      footer={
+        push.status !== "enabled" && push.status !== "unavailable" ? (
+          <AppButton
+            title={
+              push.status === "denied"
+                ? "Налаштування сповіщень"
+                : "Увімкнути push про замовлення"
+            }
+            loading={push.status === "loading"}
+            onPress={() =>
+              void push
+                .enable()
+                .catch(() =>
+                  Alert.alert(
+                    "Сповіщення",
+                    "Не вдалося відкрити налаштування.",
+                  ),
+                )
+            }
+          />
+        ) : undefined
+      }
+    >
       {notifications?.length ? (
         <View className="gap-3 pb-4">
           {notifications.map((notification) => (
@@ -27,6 +57,16 @@ export function NotificationsSheet({
               accessibilityRole="button"
               accessibilityLabel={`Прочитати: ${notification.title}`}
               onPress={() => {
+                if (notification.orderId && notification.audience) {
+                  onClose();
+                  router.push({
+                    pathname:
+                      notification.audience === "restaurant"
+                        ? "/restaurant-order/[id]"
+                        : "/order/[id]",
+                    params: { id: notification.orderId },
+                  });
+                }
                 void markAsRead({ notificationId: notification._id }).catch(
                   () =>
                     Alert.alert(

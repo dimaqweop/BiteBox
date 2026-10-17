@@ -10,10 +10,12 @@ import { AppButton } from "@/components/ui/AppButton";
 import { Brand } from "@/components/auth/Brand";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { theme } from "@/constants/theme";
+import { usePushNotifications } from "@/providers/PushNotificationsProvider";
 
 export default function ProfileScreen() {
   const user = useQuery(api.users.getCurrentUser);
   const { signOut } = useAuthActions();
+  const push = usePushNotifications();
   const signingOut = useRef(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
@@ -24,8 +26,10 @@ export default function ProfileScreen() {
     setLoading(true);
     setError(undefined);
     try {
+      await push.prepareLogout();
       await signOut();
     } catch {
+      push.resumeAfterFailedLogout();
       setError("Не вдалося вийти. Перевірте з’єднання та спробуйте ще раз.");
     } finally {
       signingOut.current = false;
@@ -99,6 +103,32 @@ export default function ProfileScreen() {
               </Text>
             </View>
           ) : null}
+          <View className="mt-6 gap-4 rounded-3xl border border-border bg-surface p-5">
+            <Text className="font-bold text-lg text-textPrimary">
+              Сповіщення про замовлення
+            </Text>
+            <Text className="font-regular text-sm leading-6 text-secondaryText">
+              {push.message}
+            </Text>
+            {push.status !== "enabled" && push.status !== "unavailable" ? (
+              <AppButton
+                title={
+                  push.status === "denied"
+                    ? "Відкрити налаштування"
+                    : "Увімкнути сповіщення"
+                }
+                loading={push.status === "loading"}
+                variant="secondary"
+                onPress={() =>
+                  void push
+                    .enable()
+                    .catch(() =>
+                      setError("Не вдалося відкрити налаштування сповіщень."),
+                    )
+                }
+              />
+            ) : null}
+          </View>
           <View className="mt-auto gap-4 pt-10">
             {user?.role === "restaurant_owner" || user?.role === "admin" ? (
               <AppButton

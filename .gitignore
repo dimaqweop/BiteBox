@@ -36,6 +36,10 @@ yarn-error.*
 # Local restaurant account credentials
 /restaurant-access.local.json
 
+# Firebase client configuration and service-account keys
+/google-services*.json
+/*firebase-adminsdk*.json
+
 # typescript
 *.tsbuildinfo
 

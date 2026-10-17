@@ -220,6 +220,15 @@ export default defineSchema({
       "status",
       "createdAt",
     ]),
+  pushDevices: defineTable({
+    userId: v.id("users"),
+    sessionId: v.id("authSessions"),
+    token: v.string(),
+    updatedAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_sessionId", ["sessionId"])
+    .index("by_userId", ["userId"]),
   notifications: defineTable({
     userId: v.id("users"),
     title: v.string(),
@@ -227,5 +236,9 @@ export default defineSchema({
     type: v.string(),
     isRead: v.boolean(),
     createdAt: v.number(),
+    orderId: v.optional(v.id("orders")),
+    audience: v.optional(
+      v.union(v.literal("customer"), v.literal("restaurant")),
+    ),
   }).index("by_userId_and_createdAt", ["userId", "createdAt"]),
 });

@@ -18,6 +18,7 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { theme } from "@/constants/theme";
 import { api } from "@/convex/_generated/api";
 import { CartProvider } from "@/providers/CartProvider";
+import { PushNotificationsProvider } from "@/providers/PushNotificationsProvider";
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 const convex = convexUrl
@@ -34,30 +35,32 @@ function RootNavigator() {
     return <LoadingScreen />;
   }
   return (
-    <CartProvider key={user?._id ?? "guest"} ownerId={user?._id ?? "guest"}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.colors.background },
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Protected guard={!isAuthenticated}>
-          <Stack.Screen name="(auth)" />
-        </Stack.Protected>
-        <Stack.Protected guard={isAuthenticated}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="restaurant/[id]" />
-          <Stack.Screen name="food/[id]" />
-          <Stack.Screen name="cart" />
-          <Stack.Screen name="checkout" />
-          <Stack.Screen name="order/[id]" />
-          <Stack.Screen name="favorites" />
-          <Stack.Screen name="restaurant-orders" />
-          <Stack.Screen name="restaurant-order/[id]" />
-        </Stack.Protected>
-      </Stack>
-    </CartProvider>
+    <PushNotificationsProvider userId={user?._id ?? null}>
+      <CartProvider key={user?._id ?? "guest"} ownerId={user?._id ?? "guest"}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: theme.colors.background },
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Protected guard={!isAuthenticated}>
+            <Stack.Screen name="(auth)" />
+          </Stack.Protected>
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="restaurant/[id]" />
+            <Stack.Screen name="food/[id]" />
+            <Stack.Screen name="cart" />
+            <Stack.Screen name="checkout" />
+            <Stack.Screen name="order/[id]" />
+            <Stack.Screen name="favorites" />
+            <Stack.Screen name="restaurant-orders" />
+            <Stack.Screen name="restaurant-order/[id]" />
+          </Stack.Protected>
+        </Stack>
+      </CartProvider>
+    </PushNotificationsProvider>
   );
 }
 
